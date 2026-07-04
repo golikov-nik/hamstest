@@ -144,63 +144,66 @@ py::tuple bitvector_iters(
     std::vector<int> value = value_from_positions(one_positions, N);
     AdapterParams params(adapter, state, N);
 
-    py::gil_scoped_release release;
-
     uint64_t hash = current_hash;
     int successes = 0;
-    const ssize_t iteration_count = std::min<ssize_t>(
-        iters,
+    const int requested_iters = std::max(iters, 0);
+    const auto iteration_count = std::min<size_t>(
+        static_cast<size_t>(requested_iters),
         std::min(zero_choices.size(), one_choices.size())
     );
 
-    for (ssize_t step = 0; step < iteration_count; ++step) {
-        const int zero_choice = zero_choices[static_cast<size_t>(step)];
-        const int one_choice = one_choices[static_cast<size_t>(step)];
+    {
+        // Keep Python-facing writes below outside the GIL release scope.
+        py::gil_scoped_release release;
 
-        const int zero_index = zero_positions[static_cast<size_t>(zero_choice)];
-        if (one_choice == static_cast<int>(one_positions.size())) {
-            ++successes;
-            continue;
-        }
+        for (size_t step = 0; step < iteration_count; ++step) {
+            const int zero_choice = zero_choices[step];
+            const int one_choice = one_choices[step];
 
-        const int one_index = one_positions[static_cast<size_t>(one_choice)];
-        const int old_zero_value = value[static_cast<size_t>(zero_index)];
-        const int old_one_value = value[static_cast<size_t>(one_index)];
-
-        value[static_cast<size_t>(zero_index)] = 1;
-        value[static_cast<size_t>(one_index)] = 0;
-        const bool adapter_updated = adapter.apply_swap
-            ? adapter.apply_swap(params.get(), zero_index, one_index)
-            : false;
-
-        hash ^= hashes[static_cast<size_t>(zero_index)];
-        hash ^= hashes[static_cast<size_t>(one_index)];
-
-        if (score_hash_exceeds_bound(
-                adapter,
-                params.get(),
-                value,
-                bound_score,
-                bound_hash,
-                hash
-            )) {
-            std::swap(
-                zero_positions[static_cast<size_t>(zero_choice)],
-                one_positions[static_cast<size_t>(one_choice)]
-            );
-            ++successes;
-        } else {
-            if (adapter_updated) {
-                adapter.apply_swap(params.get(), one_index, zero_index);
+            const int zero_index = zero_positions[static_cast<size_t>(zero_choice)];
+            if (one_choice == static_cast<int>(one_positions.size())) {
+                ++successes;
+                continue;
             }
-            value[static_cast<size_t>(zero_index)] = old_zero_value;
-            value[static_cast<size_t>(one_index)] = old_one_value;
-            hash ^= hashes[static_cast<size_t>(one_index)];
+
+            const int one_index = one_positions[static_cast<size_t>(one_choice)];
+            const int old_zero_value = value[static_cast<size_t>(zero_index)];
+            const int old_one_value = value[static_cast<size_t>(one_index)];
+
+            value[static_cast<size_t>(zero_index)] = 1;
+            value[static_cast<size_t>(one_index)] = 0;
+            const bool adapter_updated = adapter.apply_swap
+                ? adapter.apply_swap(params.get(), zero_index, one_index)
+                : false;
+
             hash ^= hashes[static_cast<size_t>(zero_index)];
+            hash ^= hashes[static_cast<size_t>(one_index)];
+
+            if (score_hash_exceeds_bound(
+                    adapter,
+                    params.get(),
+                    value,
+                    bound_score,
+                    bound_hash,
+                    hash
+                )) {
+                std::swap(
+                    zero_positions[static_cast<size_t>(zero_choice)],
+                    one_positions[static_cast<size_t>(one_choice)]
+                );
+                ++successes;
+            } else {
+                if (adapter_updated) {
+                    adapter.apply_swap(params.get(), one_index, zero_index);
+                }
+                value[static_cast<size_t>(zero_index)] = old_zero_value;
+                value[static_cast<size_t>(one_index)] = old_one_value;
+                hash ^= hashes[static_cast<size_t>(one_index)];
+                hash ^= hashes[static_cast<size_t>(zero_index)];
+            }
         }
     }
 
-    py::gil_scoped_acquire acquire;
     write_array(zero_pos_arr, zero_positions);
     write_array(one_pos_arr, one_positions);
 
