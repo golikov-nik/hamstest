@@ -3,7 +3,7 @@ from enum import Enum
 
 import numpy as np
 
-from hamstest.subset import PermutationTestSubset, TestValue
+from hamstest.subset import PermutationTestSubset, TestValue, log_native_adapter_status
 from hamstest.test import AbstractPermutationTest, PermutationTestWithHashes
 from hamstest.utils import beta_mean_log, beta_var_log
 
@@ -186,6 +186,8 @@ class Estimator:
             )
 
         vals = [gen_rand_subset() for _ in range(self.sample_size)]
+        if vals:
+            log_native_adapter_status(vals[0].abstract_subset)
 
         levels = []
         vals, start_from, cur_bound, new_level = self.resample(vals)

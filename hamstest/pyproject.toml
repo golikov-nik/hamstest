@@ -45,6 +45,10 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
+adapters = [
+    "hamstest-adapter-ks>=0.1.0,<0.2.0",
+    "hamstest-adapter-mannwhitneyu>=0.1.0,<0.2.0",
+]
 plotting = [
     "joblib>=1.3",
     "matplotlib>=3.9",

@@ -3,6 +3,8 @@ try:
 except ImportError:
     import _hamstest_native as _nat  # pragma: no cover
 
+_REGISTERED_TESTS: set[str] = set()
+
 
 def run_bitvector_iters(
     kind,
@@ -35,7 +37,17 @@ def run_bitvector_iters(
 
 
 def register_test(name: str, capsule):
-    return _nat.register_test(name, capsule)
+    result = _nat.register_test(name, capsule)
+    _REGISTERED_TESTS.add(name)
+    return result
+
+
+def is_test_registered(name: str) -> bool:
+    return name in _REGISTERED_TESTS
+
+
+def registered_tests() -> tuple[str, ...]:
+    return tuple(sorted(_REGISTERED_TESTS))
 
 
 # Expose capsule name for adapters to use (optional nicety)

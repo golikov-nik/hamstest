@@ -8,6 +8,21 @@
 pip install hamstest
 ```
 
+Native C++ adapters for the bundled KS and Mann-Whitney U tests are optional:
+
+```bash
+pip install "hamstest[adapters]"
+```
+
+To check whether a native adapter is active while running the estimator, enable
+debug logging:
+
+```python
+import logging
+
+logging.basicConfig(level=logging.DEBUG)
+```
+
 Plotting helpers used by notebooks are optional:
 
 ```bash
@@ -40,7 +55,8 @@ hamstest-adapter-init my_hamstest_adapter --kind my_test
 ```
 
 Example adapters for KS and Mann-Whitney U tests are developed in the same
-GitHub repository and are published separately:
+GitHub repository and are published separately. They can be installed together
+with `hamstest[adapters]` or as individual packages:
 
 ```bash
 pip install hamstest-adapter-ks
