@@ -21,7 +21,7 @@ void* build_params(PyObject* state, int /*N*/) {
     auto* params = new MannWhitneyUParams();
     params->current_sum = dict.contains("sum") ? dict["sum"].cast<long long>() : 0;
     params->ranks.resize(static_cast<size_t>(ranks_view.shape(0)));
-    for (ssize_t i = 0; i < ranks_view.shape(0); ++i) {
+    for (py::ssize_t i = 0; i < ranks_view.shape(0); ++i) {
         params->ranks[static_cast<size_t>(i)] = ranks_view(i);
     }
     return params;

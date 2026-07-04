@@ -32,7 +32,7 @@ template <typename T, int Flags>
 std::vector<T> copy_array(py::array_t<T, Flags> array) {
     const auto view = array.template unchecked<1>();
     std::vector<T> values(static_cast<size_t>(view.shape(0)));
-    for (ssize_t i = 0; i < view.shape(0); ++i) {
+    for (py::ssize_t i = 0; i < view.shape(0); ++i) {
         values[static_cast<size_t>(i)] = view(i);
     }
     return values;
@@ -41,7 +41,7 @@ std::vector<T> copy_array(py::array_t<T, Flags> array) {
 template <typename T, int Flags>
 void write_array(py::array_t<T, Flags> array, const std::vector<T>& values) {
     auto view = array.template mutable_unchecked<1>();
-    for (ssize_t i = 0; i < static_cast<ssize_t>(values.size()); ++i) {
+    for (py::ssize_t i = 0; i < static_cast<py::ssize_t>(values.size()); ++i) {
         view(i) = values[static_cast<size_t>(i)];
     }
 }

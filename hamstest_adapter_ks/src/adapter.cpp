@@ -17,7 +17,7 @@ struct KSParams {
 int count_ones(py::array_t<int> value) {
     const auto view = value.unchecked<1>();
     int count = 0;
-    for (ssize_t i = 0; i < view.shape(0); ++i) {
+    for (py::ssize_t i = 0; i < view.shape(0); ++i) {
         count += view(i);
     }
     return count;
