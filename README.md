@@ -14,16 +14,23 @@ Install the optional plotting helpers used by the tutorial and paper notebooks w
 pip install "hamstest[plotting]"
 ```
 
-Installing the example C++ adapters for KS and Mann-Whitney U tests:
+Installing the optional native C++ adapters for KS and Mann-Whitney U tests:
 
 ```bash
-pip install hamstest
-pip install pybind11 wheel setuptools
-pip install ./hamstest_adapter_ks --no-build-isolation
-pip install ./hamstest_adapter_mannwhitneyu --no-build-isolation
+pip install hamstest-adapter-ks
+pip install hamstest-adapter-mannwhitneyu
 ```
 
-The adapters are intentionally packaged like third-party extensions: they include headers from the installed `hamstest` package rather than from this source checkout. Once `hamstest` is published, plain `pip install ./hamstest_adapter_ks` will work because pip can install `hamstest` and `pybind11` into the isolated build environment. In a local checkout, use `--no-build-isolation` after installing `hamstest` and the build tools first.
+The adapters are intentionally packaged like third-party extensions: they include headers from the installed `hamstest` package rather than from this source checkout. Installing them makes the built-in `KSTest` and `MannWhitneyUTest` implementations use the native fast path automatically.
+
+For local development, use `--no-build-isolation` after installing `hamstest` and the build tools first:
+
+```bash
+pip install -e './hamstest[dev,plotting]'
+pip install pybind11 wheel setuptools
+pip install ./hamstest_adapter_ks --no-build-isolation --no-deps
+pip install ./hamstest_adapter_mannwhitneyu --no-build-isolation --no-deps
+```
 
 When reinstalling an adapter after `hamstest` is already installed locally, use `--no-deps` too:
 

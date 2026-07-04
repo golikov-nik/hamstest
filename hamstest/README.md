@@ -40,7 +40,12 @@ hamstest-adapter-init my_hamstest_adapter --kind my_test
 ```
 
 Example adapters for KS and Mann-Whitney U tests are developed in the same
-GitHub repository and are published separately.
+GitHub repository and are published separately:
+
+```bash
+pip install hamstest-adapter-ks
+pip install hamstest-adapter-mannwhitneyu
+```
 
 ## Project
 
